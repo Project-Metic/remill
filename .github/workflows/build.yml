@@ -1,4 +1,8 @@
+# Copyright (c) Magnon Compute Corporation. All rights reserved.
 name: Build
+permissions:
+  contents: read
+
 on: [push, pull_request]
 
 # Automatically cancel previous runs of this workflow on the same branch
@@ -10,7 +14,8 @@ jobs:
   linux:
     # Skip building pull requests from the same repository
     if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
-    runs-on: ubuntu-22.04
+    runs-on: magnon-enterprise-runners
+    timeout-minutes: 30
     # We use a clean container to avoid LLVM conflicts on the GH runner images
     container:
       image: ubuntu:22.04
@@ -91,7 +96,8 @@ jobs:
   macos:
     # Skip building pull requests from the same repository
     if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
-    runs-on: macos-latest
+    runs-on: magnon-enterprise-runners
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:

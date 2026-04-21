@@ -1,3 +1,4 @@
+# Copyright (c) 2024-2026 Magnon Compute Corporation. All Rights Reserved.
 # Choose your LLVM version
 ARG LLVM_VERSION=17
 ARG UBUNTU_VERSION=22.04
@@ -53,4 +54,10 @@ COPY --from=build /opt/trailofbits /opt/trailofbits
 COPY scripts/docker-lifter-entrypoint.sh /opt/trailofbits
 ENV LLVM_VERSION=llvm${LLVM_VERSION} \
     PATH=/opt/trailofbits/bin
+# Run as non-root user
+RUN addgroup --system --gid 65534 nonroot && \
+    adduser --system --uid 65534 --gid 65534 --no-create-home nonroot
+USER nonroot
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8080}/health/live || exit 1
 ENTRYPOINT ["/opt/trailofbits/docker-lifter-entrypoint.sh"]

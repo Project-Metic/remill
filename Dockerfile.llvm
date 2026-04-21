@@ -1,3 +1,4 @@
+# Copyright (c) 2024-2026 Magnon Compute Corporation. All Rights Reserved.
 # Dockerfile for building remill with specific LLVM versions from apt.llvm.org
 # This approach supports newer LLVM versions (19, 22, etc.)
 
@@ -106,5 +107,11 @@ ENV PATH="/opt/remill/bin:${PATH}"
 # Create entrypoint script
 RUN echo '#!/bin/sh\nexec remill-lift-'${LLVM_VERSION}' "$@"' > /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/entrypoint.sh
+# Run as non-root user
+RUN addgroup --system --gid 65534 nonroot && \
+    adduser --system --uid 65534 --gid 65534 --no-create-home nonroot
+USER nonroot
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8080}/health/live || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

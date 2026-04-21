@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (c) Magnon Compute Corporation. All rights reserved.
 
 # Needed to process multiple arguments to docker image
 

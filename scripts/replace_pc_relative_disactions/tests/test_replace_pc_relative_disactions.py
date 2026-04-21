@@ -1,3 +1,5 @@
+# Copyright (c) 2024-2026 Magnon Compute Corporation. All Rights Reserved.
+
 from replace_pc_relative_disactions import __version__
 
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) Magnon Compute Corporation. All rights reserved.
 
 # This script is run inside Github Actions CI to create an archive of a fully-built project
 

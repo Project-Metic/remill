@@ -1,3 +1,5 @@
+# Copyright (c) 2024-2026 Magnon Compute Corporation. All Rights Reserved.
+
 from diff_tester_export_insns import __version__
 
 

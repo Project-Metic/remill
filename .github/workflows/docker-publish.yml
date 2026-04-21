@@ -1,4 +1,8 @@
+# Copyright (c) Magnon Compute Corporation. All rights reserved.
 name: Build and Publish Docker Images
+
+permissions:
+  contents: read
 
 on:
   push:
@@ -18,7 +22,8 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-22.04
+    runs-on: magnon-enterprise-runners
+    timeout-minutes: 60
     permissions:
       contents: read
       packages: write
@@ -77,3 +82,30 @@ jobs:
             -t test-image .
           docker run --rm test-image --version
           docker run --rm test-image --arch amd64 --ir_out /dev/stdout --bytes c704ba01000000
+
+  trivy-scan:
+    name: Trivy Vulnerability Scan
+    runs-on: magnon-enterprise-runners
+    needs: [build-and-push]
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8  # v0.24.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
